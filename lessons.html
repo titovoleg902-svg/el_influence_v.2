@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Уроки — EL · Influence Academy</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body{overflow:hidden;height:100vh;display:flex;flex-direction:column}
+    .layout{display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden}
+    .sidebar{background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .sb-top{padding:16px 18px;border-bottom:0.5px solid var(--border)}
+    .sb-top h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px}
+    .sb-top p{font-size:11px;color:var(--muted)}
+    .ob-row{display:flex;justify-content:space-between;font-size:11px;margin:8px 0 4px;color:var(--muted)}
+    .ob-pct{color:var(--gold);font-weight:500}
+    .grade-tabs{display:flex;border-bottom:0.5px solid var(--border)}
+    .gtab{flex:1;padding:10px 4px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all 0.2s;text-align:center;border-bottom:2px solid transparent}
+    .gtab:hover{color:var(--text)}
+    .gtab.active{color:var(--text);border-bottom-color:var(--accent)}
+    .sb-scroll{overflow-y:auto;flex:1;padding:6px 0 20px}
+    .sb-scroll::-webkit-scrollbar{width:3px}
+    .sb-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+    .mod-header{padding:12px 18px 4px;font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:500}
+    .l-item{display:flex;align-items:center;gap:9px;padding:8px 10px 8px 14px;cursor:pointer;transition:background 0.15s;border-left:2px solid transparent}
+    .l-item:hover{background:var(--surface2)}
+    .l-item.active{background:rgba(232,83,10,0.08);border-left-color:var(--accent)}
+    .l-status{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+    .ls-done{background:rgba(74,222,128,0.12);color:var(--green)}
+    .ls-cur{background:rgba(232,83,10,0.15);color:var(--accent)}
+    .ls-lock{background:rgba(255,255,255,0.04);color:var(--muted);font-size:9px}
+    .l-name{font-size:12px;color:var(--muted);flex:1;line-height:1.3}
+    .l-item.active .l-name{color:var(--text)}
+    .l-dur{font-size:10px;color:var(--muted);opacity:0.6}
+    .main{overflow-y:auto;padding:36px 48px 60px}
+    .main::-webkit-scrollbar{width:4px}
+    .main::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+    .l-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(212,168,67,0.1);border:0.5px solid rgba(212,168,67,0.2);border-radius:100px;padding:4px 12px;font-size:11px;color:var(--gold);font-weight:500;margin-bottom:10px}
+    .l-title{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-1px;margin-bottom:10px;line-height:1.1}
+    .l-meta{display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+    .l-meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+    .ai-strip{display:flex;align-items:center;justify-content:space-between;gap:14px;background:rgba(232,83,10,0.06);border:0.5px solid rgba(232,83,10,0.18);border-radius:12px;padding:14px 18px;margin-bottom:22px;flex-wrap:wrap}
+    .ai-strip-l{display:flex;align-items:center;gap:10px}
+    .ai-av{width:34px;height:34px;background:rgba(232,83,10,0.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px}
+    .ai-strip strong{font-size:13px;font-weight:500;display:block}
+    .ai-strip span{font-size:11px;color:var(--muted)}
+    .ai-online{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);margin-top:2px}
+    .ai-online-dot{width:4px;height:4px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+    .cblock{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:16px}
+    .cblock-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:500;margin-bottom:12px}
+    .cblock-text{font-size:15px;color:var(--text);line-height:1.8;font-weight:300}
+    .cblock-text p{margin-bottom:12px}
+    .cblock-text p:last-child{margin-bottom:0}
+    .cblock-text strong{font-weight:500}
+    .cblock-text ul{padding-left:20px;margin:8px 0}
+    .cblock-text li{margin-bottom:6px}
+    .concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:4px}
+    .cc{background:var(--surface2);border:0.5px solid var(--border);border-radius:11px;padding:14px}
+    .cc-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;margin-bottom:7px}
+    .t-nano{background:rgba(74,222,128,0.1);color:var(--green)}
+    .t-micro{background:rgba(212,168,67,0.1);color:var(--gold)}
+    .t-macro{background:rgba(232,83,10,0.1);color:#ff7a45}
+    .t-mega{background:rgba(138,43,226,0.1);color:#c084fc}
+    .cc-title{font-size:13px;font-weight:500;margin-bottom:3px}
+    .cc-sub{font-size:11px;color:var(--muted);line-height:1.4}
+    .cc-ft{font-size:10px;color:var(--muted);margin-top:7px;border-top:0.5px solid var(--border);padding-top:7px}
+    .mtable{width:100%;border-collapse:collapse}
+    .mtable th{text-align:left;font-size:10px;color:var(--muted);font-weight:500;padding:7px 10px;border-bottom:0.5px solid var(--border);letter-spacing:0.5px;text-transform:uppercase}
+    .mtable td{padding:9px 10px;font-size:12px;border-bottom:0.5px solid rgba(255,255,255,0.03);vertical-align:top}
+    .mtable tr:last-child td{border-bottom:none}
+    .td-n{font-weight:500}
+    .td-d{color:var(--muted);font-weight:300}
+    .td-f{font-family:monospace;font-size:11px;color:var(--gold);background:rgba(212,168,67,0.07);padding:2px 6px;border-radius:4px;white-space:nowrap}
+    .n8n-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0}
+    .n8n-node{background:var(--surface2);border:0.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:500;white-space:nowrap}
+    .n8n-arrow{color:var(--muted);font-size:14px}
+    .n8n-node.trigger{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.2);color:var(--green)}
+    .n8n-node.action{background:rgba(232,83,10,0.08);border-color:rgba(232,83,10,0.2);color:var(--accent)}
+    .n8n-node.output{background:rgba(212,168,67,0.08);border-color:rgba(212,168,67,0.2);color:var(--gold)}
+    .action-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:12px;padding-top:24px;border-top:0.5px solid var(--border)}
+    .complete-btn{background:var(--green);color:#0D0D1A;border:none;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+    .complete-btn:hover{opacity:0.85}
+    .complete-btn.done{background:var(--surface2);color:var(--green);border:0.5px solid rgba(74,222,128,0.2);cursor:default}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.main{padding:20px 18px 40px}}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="index.html" class="nav-logo"><span class="nav-logo-dot"></span> EL <span class="nav-logo-sub">· Influence Academy</span></a>
+  <div class="nav-links">
+    <a href="dashboard.html" class="nav-link">Кабинет</a>
+    <a href="lessons.html" class="nav-link active">Уроки</a>
+    <a href="test.html" class="nav-link">Тесты</a>
+    <a href="ai-assistant.html" class="nav-link">AI</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <div class="nav-avatar" id="navAv">?</div>
+      <div><div class="nav-username" id="navNm"></div></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="EL.logout()">Выйти</button>
+  </div>
+</nav>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-top">
+      <h3>Программа обучения</h3>
+      <p>EL · Influence Academy</p>
+      <div class="ob-row"><span>Прогресс</span><span class="ob-pct" id="sbPct">0%</span></div>
+      <div class="pbar"><div class="pbar-fill pbar-grad" id="sbBar" style="--w:0%"></div></div>
+    </div>
+    <div class="grade-tabs">
+      <button class="gtab" id="tab-junior" onclick="switchGrade('junior')">Junior</button>
+      <button class="gtab" id="tab-middle" onclick="switchGrade('middle')">Middle</button>
+      <button class="gtab" id="tab-senior" onclick="switchGrade('senior')">Senior</button>
+    </div>
+    <div class="sb-scroll" id="sbList"></div>
+  </aside>
+  <main class="main" id="mainArea"></main>
+</div>
+<script src="data.js"></script>
+<script src="lessons-content.js"></script>
+</body>
+</html>

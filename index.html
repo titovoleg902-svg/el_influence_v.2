@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EL · Influence Academy — Обучение Influence Маркетингу</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #E8530A; --gold: #D4A843; --green: #4ade80;
+      --bg: #0D0D1A; --surface: #16162A; --surface2: #1E1E35;
+      --border: rgba(255,255,255,0.07); --text: #F0EDE8; --muted: rgba(240,237,232,0.5);
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 48px; border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; background: rgba(13,13,26,0.93);
+      backdrop-filter: blur(16px); z-index: 100;
+    }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-btn { background: var(--accent); color: #fff; border: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: opacity 0.2s; }
+    .nav-btn:hover { opacity: 0.85; }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    .hero { padding: 100px 48px 72px; max-width: 1140px; margin: 0 auto; animation: fadeUp 0.7s ease both; }
+    .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(232,83,10,0.12); border: 0.5px solid rgba(232,83,10,0.3); border-radius: 100px; padding: 6px 14px; font-size: 12px; color: var(--accent); font-weight: 500; margin-bottom: 28px; letter-spacing: 0.5px; }
+    .hero-tag-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    h1 { font-family: 'Syne', sans-serif; font-size: clamp(40px, 6vw, 72px); font-weight: 800; line-height: 1.02; letter-spacing: -2.5px; max-width: 760px; margin-bottom: 24px; }
+    h1 span { color: var(--accent); }
+    .hero-sub { font-size: 17px; color: var(--muted); max-width: 500px; line-height: 1.75; margin-bottom: 44px; font-weight: 300; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary { background: var(--accent); color: #fff; border: none; padding: 15px 30px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-primary:hover { background: #d14800; transform: translateY(-2px); }
+    .btn-secondary { background: transparent; color: var(--text); border: 0.5px solid rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 10px; font-size: 15px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+
+    .stats { display: flex; gap: 48px; margin-top: 64px; padding-top: 48px; border-top: 0.5px solid var(--border); flex-wrap: wrap; }
+    .stat-num { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 700; }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+    .section { padding: 72px 48px; max-width: 1140px; margin: 0 auto; }
+    .section-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; font-weight: 500; }
+    .section-title { font-family: 'Syne', sans-serif; font-size: clamp(26px, 3.5vw, 40px); font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+    .section-sub { color: var(--muted); font-size: 15px; font-weight: 300; margin-bottom: 44px; }
+
+    .grades-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+    .grade-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px; padding: 32px; position: relative; overflow: hidden; text-decoration: none; color: inherit; display: block; transition: all 0.25s; }
+    .grade-card:hover { border-color: rgba(255,255,255,0.15); background: var(--surface2); transform: translateY(-3px); }
+    .grade-card.featured { border-color: rgba(232,83,10,0.35); background: linear-gradient(135deg,rgba(232,83,10,0.07),var(--surface)); }
+    .grade-badge { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 500; letter-spacing: 0.5px; margin-bottom: 18px; }
+    .badge-junior { background: rgba(74,222,128,0.12); color: var(--green); border: 0.5px solid rgba(74,222,128,0.2); }
+    .badge-middle { background: rgba(212,168,67,0.12); color: var(--gold); border: 0.5px solid rgba(212,168,67,0.2); }
+    .badge-senior { background: rgba(232,83,10,0.12); color: #ff7a45; border: 0.5px solid rgba(232,83,10,0.2); }
+    .grade-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
+    .grade-desc { font-size: 14px; color: var(--muted); line-height: 1.65; font-weight: 300; margin-bottom: 24px; }
+    .grade-modules { display: flex; flex-direction: column; gap: 7px; }
+    .module-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+    .module-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    .grade-arrow { position: absolute; top: 28px; right: 28px; color: var(--muted); font-size: 18px; opacity: 0; transition: all 0.2s; }
+    .grade-card:hover .grade-arrow { opacity: 1; transform: translateX(3px); }
+    .progress-bar { height: 2px; background: rgba(255,255,255,0.06); border-radius: 1px; margin-top: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 1px; }
+    .pf-junior { width: 35%; background: var(--green); }
+    .pf-middle { width: 65%; background: var(--gold); }
+    .pf-senior { width: 90%; background: var(--accent); }
+
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .feature-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 24px; transition: border-color 0.2s; }
+    .feature-card:hover { border-color: rgba(255,255,255,0.14); }
+    .feature-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
+    .fi-ai { background: rgba(232,83,10,0.12); border: 0.5px solid rgba(232,83,10,0.2); }
+    .fi-test { background: rgba(74,222,128,0.1); border: 0.5px solid rgba(74,222,128,0.2); }
+    .fi-n8n { background: rgba(212,168,67,0.1); border: 0.5px solid rgba(212,168,67,0.2); }
+    .fi-grade { background: rgba(138,43,226,0.1); border: 0.5px solid rgba(138,43,226,0.2); }
+    .feature-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    .ai-banner { background: var(--surface); border: 0.5px solid rgba(232,83,10,0.25); border-radius: 18px; padding: 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
+    .ai-banner h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .ai-banner p { font-size: 14px; color: var(--muted); font-weight: 300; }
+    .ai-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+    .ai-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+
+    footer { border-top: 0.5px solid var(--border); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-text { font-size: 12px; color: var(--muted); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 60px 20px 48px; }
+      .section { padding: 48px 20px; }
+      .stats { gap: 28px; }
+      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="logo-dot"></span> EL · Influence Academy</a>
+  <div class="nav-links">
+    <a href="#grades">Программа</a>
+    <a href="#features">Возможности</a>
+    <a href="lessons.html">Уроки</a>
+    <a href="ai-assistant.html">AI помощник</a>
+  </div>
+  <a href="lessons.html" class="nav-btn">Начать обучение →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag"><span class="hero-tag-dot"></span> Платформа обучения · v1.0</div>
+  <h1>Стань экспертом<br>в <span>Influence</span><br>Маркетинге</h1>
+  <p class="hero-sub">Структурированная программа от Junior до Senior с AI‑ассистентом, реальными кейсами и чёткой системой грейдирования.</p>
+  <div class="hero-actions">
+    <a href="lessons.html" class="btn-primary">Начать обучение →</a>
+    <a href="#features" class="btn-secondary">Как это работает</a>
+  </div>
+  <div class="stats">
+    <div><div class="stat-num">12</div><div class="stat-label">Модулей обучения</div></div>
+    <div><div class="stat-num">3</div><div class="stat-label">Уровня грейдов</div></div>
+    <div><div class="stat-num">AI</div><div class="stat-label">Персональный ассистент</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-label">Доступ к материалам</div></div>
+  </div>
+</section>
+
+<section class="section" id="grades">
+  <div class="section-label">Система грейдирования</div>
+  <div class="section-title">Ваш путь роста</div>
+  <p class="section-sub">Три уровня — от базовых знаний до стратегического мышления</p>
+  <div class="grades-grid">
+    <a href="lessons.html?grade=junior" class="grade-card">
+      <span class="grade-arrow">→</span>
+      <div class="grade-badge badge-junior">Junior</div>
+      <div class="grade-title">Основы</div>
+      <p class="grade-desc">Рынок инфлюенсеров, базовые метрики, первые кампании</p>
+      <div class="grade-modules">
+        <div class="module-item"><span class="module-dot"></span>Типы инфлюенсеров</div>
+        <div class="module-item"><span class="module-dot"></span>Анализ аудитории</div>
+        <div class="module-item"><span class="module-dot"></span>Первые коллаборации</div>
+        <div class="module-item"><span class="module-dot"></span>Основные метрики</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill pf-junior"></div></div>
+    </a>
+    <a href="lessons.html?grade=middle" class="grade-card featured">
+      <span class="grade-arrow">→</span>
+      <div class="grade-badge badge-middle">Middle</div>
+      <div class="grade-title">Стратегия</div>
+      <p class="grade-desc">Долгосрочные партнёрства, медиапланирование, управление кампаниями</p>
+      <div class="grade-modules">
+        <div class="module-item"><span class="module-dot"></span>Стратегия контента</div>
+        <div class="module-item"><span class="module-dot"></span>Переговоры и контракты</div>
+        <div class="module-item"><span class="module-dot"></span>Мультиканальные кампании</div>
+        <div class="module-item"><span class="module-dot"></span>ROI и аналитика</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill pf-middle"></div></div>
+    </a>
+    <a href="lessons.html?grade=senior" class="grade-card">
+      <span class="grade-arrow">→</span>
+      <div class="grade-badge badge-senior">Senior</div>
+      <div class="grade-title">Экспертиза</div>
+      <p class="grade-desc">Управление агентством, масштабные стратегии, лидерство команд</p>
+      <div class="grade-modules">
+        <div class="module-item"><span class="module-dot"></span>Brand building</div>
+        <div class="module-item"><span class="module-dot"></span>Управление командой</div>
+        <div class="module-item"><span class="module-dot"></span>P&amp;L и бюджеты</div>
+        <div class="module-item"><span class="module-dot"></span>Стратегические альянсы</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill pf-senior"></div></div>
+    </a>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="section-label">Возможности платформы</div>
+  <div class="section-title">Всё для роста в одном месте</div>
+  <p class="section-sub">Учись, тестируйся и получай обратную связь от AI в реальном времени</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon fi-ai">🤖</div>
+      <div class="feature-title">AI ассистент</div>
+      <p class="feature-desc">Персональный помощник на базе Claude. Отвечает на вопросы, разбирает кейсы, даёт обратную связь.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-test">✅</div>
+      <div class="feature-title">Тестирование</div>
+      <p class="feature-desc">Проверка знаний после каждого модуля с автоматической оценкой и рекомендациями.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-n8n">⚡</div>
+      <div class="feature-title">n8n автоматизация</div>
+      <p class="feature-desc">Уведомления, трекинг прогресса, автоматические отчёты для HR и руководителей.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon fi-grade">🏆</div>
+      <div class="feature-title">Грейдирование</div>
+      <p class="feature-desc">Чёткая система уровней с сертификатами и подтверждением экспертизы.</p>
+    </div>
+  </div>
+  <div class="ai-banner">
+    <div>
+      <h3>AI ассистент готов помочь</h3>
+      <p>Задавай вопросы по материалам, разбирай реальные кейсы,<br>получай мгновенную обратную связь 24/7</p>
+      <div class="ai-indicator"><span class="ai-dot"></span> Онлайн и готов к диалогу</div>
+    </div>
+    <a href="ai-assistant.html" class="btn-primary">Открыть AI ассистент →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">EL · Influence Academy</div>
+  <div class="footer-links">
+    <a href="#grades">Программа</a>
+    <a href="lessons.html">Уроки</a>
+    <a href="test.html">Тесты</a>
+    <a href="ai-assistant.html">AI помощник</a>
+  </div>
+  <div class="footer-text">© 2025 EL · Influence Academy</div>
+</footer>
+
+</body>
+</html>

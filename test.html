@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тест — EL · Influence Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #E8530A; --gold: #D4A843; --green: #4ade80; --red: #f87171;
+      --bg: #0D0D1A; --surface: #16162A; --surface2: #1E1E35;
+      --border: rgba(255,255,255,0.07); --text: #F0EDE8; --muted: rgba(240,237,232,0.5);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-bottom: 0.5px solid var(--border); background: rgba(13,13,26,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 7px; text-decoration: none; color: var(--text); }
+    .logo-dot { width: 7px; height: 7px; background: #E8530A; border-radius: 50%; }
+    .back-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .back-link:hover { color: var(--text); }
+
+    .test-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* HEADER */
+    .test-header { margin-bottom: 40px; }
+    .test-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(212,168,67,0.1); border: 0.5px solid rgba(212,168,67,0.25); border-radius: 100px; padding: 4px 14px; font-size: 12px; color: var(--gold); font-weight: 500; margin-bottom: 14px; }
+    .test-title { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
+    .test-sub { font-size: 15px; color: var(--muted); font-weight: 300; margin-bottom: 20px; }
+    .test-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+    .tm-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+
+    /* PROGRESS */
+    .progress-section { margin-bottom: 36px; }
+    .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .progress-label { font-size: 13px; color: var(--muted); }
+    .progress-counter { font-size: 13px; font-weight: 500; }
+    .progress-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); border-radius: 2px; transition: width 0.4s ease; }
+
+    /* TIMER */
+    .timer-box { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 10px; padding: 10px 18px; margin-bottom: 28px; }
+    .timer-icon { font-size: 16px; }
+    .timer-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+    .timer-label { font-size: 12px; color: var(--muted); }
+    .timer-box.warning { border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.05); }
+    .timer-box.warning .timer-val { color: var(--red); }
+
+    /* QUESTION CARD */
+    .question-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 18px; padding: 32px; margin-bottom: 20px; animation: fadeUp 0.3s ease; }
+    .q-number { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+    .q-text { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.35; margin-bottom: 24px; letter-spacing: -0.5px; }
+
+    /* OPTIONS */
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 14px 18px; cursor: pointer;
+      transition: all 0.2s; user-select: none;
+    }
+    .option:hover:not(.disabled) { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+    .option.selected { border-color: var(--accent); background: rgba(232,83,10,0.08); }
+    .option.correct { border-color: var(--green); background: rgba(74,222,128,0.08); }
+    .option.wrong { border-color: var(--red); background: rgba(248,113,113,0.08); animation: shake 0.3s ease; }
+    .option.disabled { cursor: default; pointer-events: none; }
+    .option-letter {
+      width: 28px; height: 28px; border-radius: 8px; background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; flex-shrink: 0; transition: all 0.2s;
+    }
+    .option.selected .option-letter { background: rgba(232,83,10,0.2); color: var(--accent); }
+    .option.correct .option-letter { background: rgba(74,222,128,0.2); color: var(--green); }
+    .option.wrong .option-letter { background: rgba(248,113,113,0.2); color: var(--red); }
+    .option-text { font-size: 14px; line-height: 1.4; }
+
+    /* FEEDBACK */
+    .feedback-box { border-radius: 12px; padding: 14px 18px; margin-top: 16px; display: none; }
+    .feedback-box.show { display: block; animation: fadeUp 0.25s ease; }
+    .feedback-box.correct { background: rgba(74,222,128,0.06); border: 0.5px solid rgba(74,222,128,0.25); }
+    .feedback-box.wrong { background: rgba(248,113,113,0.06); border: 0.5px solid rgba(248,113,113,0.2); }
+    .feedback-icon { font-size: 16px; margin-bottom: 4px; }
+    .feedback-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .feedback-text { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ACTIONS */
+    .test-actions { display: flex; justify-content: flex-end; gap: 12px; }
+    .btn-next { background: var(--accent); color: #fff; border: none; padding: 13px 28px; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; opacity: 0.4; pointer-events: none; }
+    .btn-next.enabled { opacity: 1; pointer-events: auto; }
+    .btn-next.enabled:hover { background: #d14800; }
+
+    /* RESULTS */
+    .results-screen { text-align: center; padding: 20px 0; display: none; }
+    .results-screen.show { display: block; animation: fadeUp 0.4s ease; }
+    .result-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; position: relative; }
+    .rc-great { background: rgba(74,222,128,0.12); border: 2px solid rgba(74,222,128,0.3); color: var(--green); }
+    .rc-good { background: rgba(212,168,67,0.12); border: 2px solid rgba(212,168,67,0.3); color: var(--gold); }
+    .rc-fail { background: rgba(248,113,113,0.1); border: 2px solid rgba(248,113,113,0.25); color: var(--red); }
+    .result-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .result-sub { font-size: 15px; color: var(--muted); font-weight: 300; margin-bottom: 32px; }
+    .result-stats { display: flex; justify-content: center; gap: 32px; margin-bottom: 36px; flex-wrap: wrap; }
+    .rs-item { }
+    .rs-num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; }
+    .rs-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .result-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-outline { background: transparent; border: 0.5px solid rgba(255,255,255,0.2); color: var(--text); padding: 12px 24px; border-radius: 10px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; transition: all 0.2s; }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.4); }
+    .btn-solid { background: var(--accent); color: #fff; border: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
+    .btn-solid:hover { opacity: 0.85; }
+    .btn-gold-solid { background: var(--gold); color: #0D0D1A; border: none; padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; }
+
+    .review-list { text-align: left; margin-top: 32px; border-top: 0.5px solid var(--border); padding-top: 32px; }
+    .review-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .review-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 12px; }
+    .ri-q { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+    .ri-answer { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 7px 12px; border-radius: 8px; margin-bottom: 4px; }
+    .ri-correct { background: rgba(74,222,128,0.08); color: var(--green); }
+    .ri-wrong { background: rgba(248,113,113,0.08); color: var(--red); }
+    .ri-explain { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="logo-dot"></span> EL · Influence Academy</a>
+  <a href="lessons.html" class="back-link">← К урокам</a>
+</nav>
+
+<div class="test-wrap">
+
+  <!-- TEST SCREEN -->
+  <div id="testScreen">
+    <div class="test-header">
+      <div class="test-badge">Junior · Модуль 1</div>
+      <h1 class="test-title">Тест: Основы Influence маркетинга</h1>
+      <p class="test-sub">Проверь свои знания по первому модулю. Нужно набрать 70% для прохождения.</p>
+      <div class="test-meta">
+        <div class="tm-item">❓ <span id="totalQ">7</span> вопросов</div>
+        <div class="tm-item">⏱ 7 минут</div>
+        <div class="tm-item">🎯 Проходной балл: 70%</div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-row">
+        <span class="progress-label">Прогресс теста</span>
+        <span class="progress-counter"><span id="currentQ">1</span> / <span id="totalQc">7</span></span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:14%"></div></div>
+    </div>
+
+    <div class="timer-box" id="timerBox">
+      <span class="timer-icon">⏱</span>
+      <span class="timer-val" id="timerVal">7:00</span>
+      <span class="timer-label">осталось</span>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <!-- Rendered by JS -->
+    </div>
+
+    <div class="test-actions">
+      <button class="btn-next" id="nextBtn" onclick="nextQuestion()">Следующий вопрос →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div class="results-screen" id="resultsScreen"></div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    q: 'Какой тип инфлюенсеров обычно имеет самый высокий Engagement Rate?',
+    options: ['Мега-инфлюенсеры (1M+)', 'Макро-инфлюенсеры (100K–1M)', 'Нано-инфлюенсеры (1K–10K)', 'Знаменитости'],
+    correct: 2,
+    explain: 'Нано-инфлюенсеры имеют ER 5–8%, потому что их аудитория — реальные знакомые и преданные подписчики. У мега-звёзд ER падает до 1–2%.'
+  },
+  {
+    q: 'Как расшифровывается ER в контексте influence-маркетинга?',
+    options: ['External Reach', 'Engagement Rate', 'Earned Revenue', 'Exposure Ratio'],
+    correct: 1,
+    explain: 'Engagement Rate (ER) — коэффициент вовлечённости. Формула: (лайки + комментарии) / охват × 100%.'
+  },
+  {
+    q: 'В каком году объём рынка influence-маркетинга составлял $1.7 млрд?',
+    options: ['2014', '2016', '2018', '2020'],
+    correct: 1,
+    explain: 'Рынок стартовал с $1.7 млрд в 2016 году и вырос до $21 млрд к 2023 году — это рост в 12 раз за 7 лет.'
+  },
+  {
+    q: 'Какую аудиторию охватывает микро-инфлюенсер?',
+    options: ['До 1 000 подписчиков', '10 000 – 100 000', '100 000 – 1 000 000', 'Более 1 000 000'],
+    correct: 1,
+    explain: 'Micro: 10K–100K. Nano: 1K–10K. Macro: 100K–1M. Mega: 1M+. Это стандартная классификация рынка.'
+  },
+  {
+    q: 'Что означает CPM?',
+    options: ['Cost Per Message', 'Cost Per Mille (1000 показов)', 'Content Performance Metric', 'Channel Partnership Model'],
+    correct: 1,
+    explain: 'CPM — Cost Per Mille, стоимость 1000 показов. Формула: бюджет / количество показов × 1000.'
+  },
+  {
+    q: 'Почему influence-контент эффективнее баннерной рекламы?',
+    options: ['Дешевле в производстве', 'Нативность — контент выглядит органично в ленте', 'Охватывает больше людей', 'Проще отслеживать'],
+    correct: 1,
+    explain: 'Нативность — главное преимущество. CTR у influence-контента в 2–5 раз выше баннеров, потому что мозг не воспринимает его как рекламу.'
+  },
+  {
+    q: 'Для каких целей лучше всего подойдут нано и микро-инфлюенсеры?',
+    options: ['Масштабный охват на всю страну', 'Нишевые продукты и первые тесты', 'Имиджевые кампании крупных брендов', 'Выход на международный рынок'],
+    correct: 1,
+    explain: 'Nano/Micro — идеал для нишевых продуктов, локального бизнеса и тестов с небольшим бюджетом. Высокое доверие аудитории компенсирует меньший охват.'
+  }
+];
+
+let current = 0;
+let answers = [];
+let selected = null;
+let answered = false;
+let timeLeft = 420;
+let timerInterval;
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timerVal').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    const box = document.getElementById('timerBox');
+    if (timeLeft <= 60) box.classList.add('warning');
+    if (timeLeft <= 0) { clearInterval(timerInterval); finishTest(); }
+  }, 1000);
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  selected = null;
+  answered = false;
+  document.getElementById('nextBtn').classList.remove('enabled');
+  document.getElementById('currentQ').textContent = current + 1;
+  document.getElementById('progressFill').style.width = ((current + 1) / questions.length * 100) + '%';
+  const letters = ['А','Б','В','Г'];
+  let html = `<div class="q-number">Вопрос ${current + 1} из ${questions.length}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">`;
+  q.options.forEach((opt, i) => {
+    html += `<div class="option" id="opt${i}" onclick="selectOption(${i})">
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${opt}</div>
+    </div>`;
+  });
+  html += `</div>
+    <div class="feedback-box" id="feedbackBox">
+      <div class="feedback-icon" id="feedbackIcon"></div>
+      <div class="feedback-title" id="feedbackTitle"></div>
+      <div class="feedback-text" id="feedbackText"></div>
+    </div>`;
+  document.getElementById('questionCard').innerHTML = html;
+}
+
+function selectOption(i) {
+  if (answered) return;
+  answered = true;
+  selected = i;
+  const q = questions[current];
+  const isCorrect = i === q.correct;
+  answers.push({ q: q.q, selected: i, correct: q.correct, isCorrect, explain: q.explain, options: q.options });
+
+  document.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+  document.getElementById(`opt${i}`).classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) document.getElementById(`opt${q.correct}`).classList.add('correct');
+
+  const fb = document.getElementById('feedbackBox');
+  fb.className = `feedback-box show ${isCorrect ? 'correct' : 'wrong'}`;
+  document.getElementById('feedbackIcon').textContent = isCorrect ? '✅' : '❌';
+  document.getElementById('feedbackTitle').textContent = isCorrect ? 'Верно!' : 'Неверно';
+  document.getElementById('feedbackText').textContent = q.explain;
+
+  const btn = document.getElementById('nextBtn');
+  btn.classList.add('enabled');
+  btn.textContent = current === questions.length - 1 ? 'Завершить тест ✓' : 'Следующий вопрос →';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) { finishTest(); return; }
+  renderQuestion();
+}
+
+function finishTest() {
+  clearInterval(timerInterval);
+  document.getElementById('testScreen').style.display = 'none';
+  const correct = answers.filter(a => a.isCorrect).length;
+  const pct = Math.round(correct / questions.length * 100);
+  const passed = pct >= 70;
+  const timeSpent = 420 - timeLeft;
+  const mins = Math.floor(timeSpent / 60);
+  const secs = timeSpent % 60;
+
+  let circleClass, emoji, title, sub;
+  if (pct >= 90) { circleClass='rc-great'; emoji='🏆'; title='Отличный результат!'; sub='Ты отлично усвоил материал. Можно двигаться дальше!'; }
+  else if (pct >= 70) { circleClass='rc-good'; emoji='👍'; title='Тест пройден!'; sub='Хороший результат. Рекомендуем повторить темы где ошибся.'; }
+  else { circleClass='rc-fail'; emoji='📚'; title='Нужно повторить'; sub='Результат ниже проходного балла. Перечитай материал и попробуй снова.'; }
+
+  let reviewHtml = answers.map((a, i) => `
+    <div class="review-item">
+      <div class="ri-q">${i+1}. ${a.q}</div>
+      <div class="ri-answer ${a.isCorrect ? 'ri-correct' : 'ri-wrong'}">
+        ${a.isCorrect ? '✓' : '✗'} Твой ответ: ${a.options[a.selected]}
+      </div>
+      ${!a.isCorrect ? `<div class="ri-answer ri-correct">✓ Правильно: ${a.options[a.correct]}</div>` : ''}
+      <div class="ri-explain">${a.explain}</div>
+    </div>`).join('');
+
+  const screen = document.getElementById('resultsScreen');
+  screen.innerHTML = `
+    <div class="result-circle ${circleClass}">${pct}%</div>
+    <h2 class="result-title">${title}</h2>
+    <p class="result-sub">${sub}</p>
+    <div class="result-stats">
+      <div class="rs-item"><div class="rs-num" style="color:var(--green)">${correct}</div><div class="rs-label">Правильных</div></div>
+      <div class="rs-item"><div class="rs-num" style="color:var(--red)">${questions.length - correct}</div><div class="rs-label">Ошибок</div></div>
+      <div class="rs-item"><div class="rs-num">${mins}:${secs.toString().padStart(2,'0')}</div><div class="rs-label">Потрачено</div></div>
+      <div class="rs-item"><div class="rs-num" style="color:${passed?'var(--green)':'var(--red)'}">70%</div><div class="rs-label">Проходной балл</div></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-outline" onclick="restartTest()">🔄 Пройти заново</button>
+      <a href="lessons.html" class="btn-outline">📖 К урокам</a>
+      ${passed ? '<a href="ai-assistant.html" class="btn-solid">Спросить AI о результатах →</a>' : '<button class="btn-gold-solid" onclick="restartTest()">Попробовать снова</button>'}
+    </div>
+    <div class="review-list">
+      <div class="review-title">Разбор ответов</div>
+      ${reviewHtml}
+    </div>`;
+  screen.classList.add('show');
+  window.scrollTo(0, 0);
+}
+
+function restartTest() {
+  current = 0; answers = []; selected = null; answered = false; timeLeft = 420;
+  clearInterval(timerInterval);
+  document.getElementById('resultsScreen').classList.remove('show');
+  document.getElementById('resultsScreen').innerHTML = '';
+  document.getElementById('testScreen').style.display = 'block';
+  document.getElementById('timerBox').classList.remove('warning');
+  renderQuestion();
+  startTimer();
+}
+
+renderQuestion();
+startTimer();
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Ассистент — EL · Influence Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #E8530A; --gold: #D4A843; --green: #4ade80;
+      --bg: #0D0D1A; --surface: #16162A; --surface2: #1E1E35;
+      --border: rgba(255,255,255,0.07); --text: #F0EDE8; --muted: rgba(240,237,232,0.5);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    @keyframes pulse  { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 0.5px solid var(--border); background: rgba(13,13,26,0.97); flex-shrink: 0; z-index: 10; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text); }
+    .logo-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+    .logo-sub { font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: 0.5px; }
+    .nav-center { display: flex; align-items: center; gap: 10px; }
+    .ai-av { width: 30px; height: 30px; background: rgba(232,83,10,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .ai-name { font-size: 14px; font-weight: 500; }
+    .ai-status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .ai-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+    .back-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .back-link:hover { color: var(--text); }
+
+    .chat-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* SIDEBAR */
+    .sidebar { width: 260px; border-right: 0.5px solid var(--border); background: var(--surface); display: flex; flex-direction: column; flex-shrink: 0; }
+    .sb-head { padding: 16px; border-bottom: 0.5px solid var(--border); }
+    .sb-head h4 { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .sb-head p { font-size: 11px; color: var(--muted); }
+    .new-btn { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px 12px 0; padding: 10px; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+    .new-btn:hover { border-color: rgba(255,255,255,0.15); }
+    .sq-scroll { padding: 12px; overflow-y: auto; flex: 1; }
+    .sq-lbl { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; font-weight: 500; margin-bottom: 8px; padding: 0 4px; }
+    .sq { padding: 9px 10px; border-radius: 8px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.15s; margin-bottom: 4px; line-height: 1.4; border: 0.5px solid transparent; }
+    .sq:hover { background: var(--surface2); color: var(--text); border-color: var(--border); }
+    .sq-tag { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 500; margin-bottom: 3px; }
+    .t-base  { background: rgba(74,222,128,0.1); color: var(--green); }
+    .t-strat { background: rgba(212,168,67,0.1); color: var(--gold); }
+    .t-case  { background: rgba(232,83,10,0.1);  color: #ff7a45; }
+    .ctx-sec { padding: 12px; border-top: 0.5px solid var(--border); }
+    .ctx-lbl { font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+    .ctx-sel { width: 100%; background: var(--surface2); border: 0.5px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; outline: none; cursor: pointer; }
+
+    /* CHAT */
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .messages { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+    /* WELCOME */
+    .welcome { text-align: center; padding: 40px 20px; max-width: 480px; margin: auto; }
+    .wl-icon { width: 64px; height: 64px; background: rgba(232,83,10,0.12); border: 0.5px solid rgba(232,83,10,0.25); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
+    .welcome h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+    .welcome p { font-size: 14px; color: var(--muted); line-height: 1.65; font-weight: 300; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 20px; }
+    .chip { background: var(--surface); border: 0.5px solid var(--border); padding: 7px 14px; border-radius: 100px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .chip:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+    /* MESSAGES */
+    .msg { display: flex; gap: 12px; animation: fadeUp 0.25s ease; }
+    .msg.user { flex-direction: row-reverse; }
+    .m-av { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .av-ai   { background: rgba(232,83,10,0.15); }
+    .av-user { background: rgba(255,255,255,0.08); font-size: 12px; font-weight: 600; }
+    .m-bbl { max-width: 75%; }
+    .msg.user .m-bbl { display: flex; flex-direction: column; align-items: flex-end; }
+    .bbl { padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.65; }
+    .bbl-ai   { background: var(--surface); border: 0.5px solid var(--border); border-top-left-radius: 4px; }
+    .bbl-user { background: rgba(232,83,10,0.15); border: 0.5px solid rgba(232,83,10,0.2); border-top-right-radius: 4px; }
+    .bbl p { margin-bottom: 8px; }
+    .bbl p:last-child { margin-bottom: 0; }
+    .bbl strong { font-weight: 500; }
+    .bbl ul { padding-left: 18px; margin: 6px 0; }
+    .bbl li { margin-bottom: 4px; }
+    .m-time { font-size: 11px; color: var(--muted); margin-top: 4px; padding: 0 4px; }
+
+    .typing { display: flex; gap: 4px; align-items: center; padding: 14px 16px; }
+    .t-dot { width: 6px; height: 6px; background: var(--muted); border-radius: 50%; animation: blink 1.2s infinite; }
+    .t-dot:nth-child(2) { animation-delay: 0.2s; }
+    .t-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    /* DEMO BANNER */
+    .demo-bar { background: rgba(212,168,67,0.07); border-top: 0.5px solid rgba(212,168,67,0.15); padding: 9px 28px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+    .demo-badge { background: rgba(212,168,67,0.12); border: 0.5px solid rgba(212,168,67,0.25); color: var(--gold); padding: 2px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+
+    /* INPUT */
+    .input-area { border-top: 0.5px solid var(--border); padding: 16px 28px 20px; background: var(--bg); flex-shrink: 0; }
+    .input-box { background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-end; gap: 12px; transition: border-color 0.2s; }
+    .input-box:focus-within { border-color: rgba(255,255,255,0.15); }
+    .msg-input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; resize: none; max-height: 120px; line-height: 1.5; }
+    .msg-input::placeholder { color: var(--muted); }
+    .send-btn { width: 36px; height: 36px; background: var(--accent); border: none; border-radius: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .send-btn:hover:not(:disabled) { background: #d14800; }
+    .send-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .s-icon { width: 16px; height: 16px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .input-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .messages { padding: 16px; }
+      .input-area { padding: 12px 16px 16px; }
+      .demo-bar { padding: 9px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <span class="logo-dot"></span> EL <span class="logo-sub">· Influence Academy</span>
+  </a>
+  <div class="nav-center">
+    <div class="ai-av">🤖</div>
+    <div>
+      <div class="ai-name">AI Ассистент</div>
+      <div class="ai-status"><span class="ai-dot"></span> Демо-режим</div>
+    </div>
+  </div>
+  <a href="lessons.html" class="back-link">← К урокам</a>
+</nav>
+
+<div class="chat-layout">
+
+  <aside class="sidebar">
+    <div class="sb-head">
+      <h4>AI Ассистент</h4>
+      <p>Эксперт по Influence маркетингу</p>
+    </div>
+    <button class="new-btn" onclick="newChat()">＋ Новый диалог</button>
+    <div class="sq-scroll">
+      <div class="sq-lbl">Вопросы по теме</div>
+      <div class="sq" onclick="ask('Что такое Engagement Rate и как его посчитать?')"><div class="sq-tag t-base">Основы</div><br>Что такое Engagement Rate?</div>
+      <div class="sq" onclick="ask('Какой тип инфлюенсера выбрать для запуска продукта с бюджетом 100 000 рублей?')"><div class="sq-tag t-strat">Стратегия</div><br>Инфлюенсер для запуска продукта</div>
+      <div class="sq" onclick="ask('Как написать правильный бриф для инфлюенсера?')"><div class="sq-tag t-base">Основы</div><br>Структура брифа</div>
+      <div class="sq" onclick="ask('Как рассчитать ROI influence-кампании?')"><div class="sq-tag t-strat">Стратегия</div><br>Как считать ROI?</div>
+      <div class="sq" onclick="ask('Разбери кейс: косметический бренд запустил кампанию с микро-инфлюенсерами')"><div class="sq-tag t-case">Кейс</div><br>Кейс: косметический бренд</div>
+      <div class="sq" onclick="ask('Как вести переговоры с агентом инфлюенсера?')"><div class="sq-tag t-strat">Стратегия</div><br>Переговоры и контракты</div>
+      <div class="sq" onclick="ask('В чём разница между Reach и Impressions?')"><div class="sq-tag t-base">Основы</div><br>Reach vs Impressions</div>
+      <div class="sq" onclick="ask('Какие ошибки делают Junior специалисты?')"><div class="sq-tag t-case">Кейс</div><br>Ошибки Junior специалистов</div>
+    </div>
+    <div class="ctx-sec">
+      <div class="ctx-lbl">Контекст урока</div>
+      <select class="ctx-sel" id="ctxSel">
+        <option value="general">Общие вопросы</option>
+        <option value="j1">Junior: Рынок инфлюенсеров</option>
+        <option value="j2">Junior: Типы инфлюенсеров</option>
+        <option value="jm">Junior: Метрики</option>
+        <option value="ms">Middle: Стратегия кампаний</option>
+        <option value="mn">Middle: Переговоры</option>
+        <option value="sl">Senior: Лидерство</option>
+      </select>
+    </div>
+  </aside>
+
+  <div class="chat-main">
+    <div class="messages" id="msgs">
+      <div class="welcome" id="wlc">
+        <div class="wl-icon">🤖</div>
+        <h2>AI Ассистент EL · Influence Academy</h2>
+        <p>Помогу разобраться в любой теме курса, объясню метрики, разберу кейсы и отвечу на вопросы по материалам уроков.</p>
+        <div class="chips">
+          <span class="chip" onclick="ask('Объясни что такое ER простыми словами')">Что такое ER?</span>
+          <span class="chip" onclick="ask('Чем отличается nano от micro инфлюенсера?')">Nano vs Micro</span>
+          <span class="chip" onclick="ask('Как составить медиаплан для influence кампании?')">Медиаплан</span>
+          <span class="chip" onclick="ask('Какие метрики важны для Junior?')">Метрики Junior</span>
+          <span class="chip" onclick="ask('Как работает CPM?')">CPM</span>
+          <span class="chip" onclick="ask('Лучшие платформы для работы с инфлюенсерами')">Платформы</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-bar">
+      <span class="demo-badge">Демо</span>
+      AI работает в демо-режиме с предустановленными ответами. Когда подключишь API — ответы станут живыми.
+    </div>
+
+    <div class="input-area">
+      <div class="input-box">
+        <textarea class="msg-input" id="inp" placeholder="Задай вопрос по материалам курса..." rows="1"
+          onkeydown="onKey(event)" oninput="resize(this)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()">
+          <svg class="s-icon" viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">Enter — отправить · Shift+Enter — новая строка</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ДЕМО-РЕЖИМ: ответы из словаря
+// Когда будешь подключать API — замени callAI() ниже
+// ════════════════════════════════════════════════════════
+
+const STUBS = {
+  er: `**Engagement Rate (ER)** — коэффициент вовлечённости.\n\n**Формула:** ER = (Лайки + Комментарии) / Охват × 100%\n\n**Нормы по типам инфлюенсеров:**\n- Nano (1K–10K): 5–8% — отлично\n- Micro (10K–100K): 3–5%\n- Macro (100K–1M): 1–3%\n- Mega (1M+): 0.5–1.5%\n\nЧем выше ER — тем больше аудитория доверяет инфлюенсеру и тем ценнее его рекомендации для бренда.`,
+  nano: `**Nano vs Micro инфлюенсеры:**\n\n**Nano (1K–10K подписчиков)**\n- ER 5–8% — самый высокий\n- Аудитория — реальные знакомые и преданные подписчики\n- Минимальная стоимость, часто бартер\n- Идеально для нишевых и локальных продуктов\n\n**Micro (10K–100K)**\n- ER 3–5%\n- Широкий охват при сохранении доверия\n- Оптимальный баланс цена/охват/качество\n- Подходит для большинства запусков\n\n**Вывод:** для первых тестов — Nano/Micro. ROI будет выше, чем у мега-звёзд.`,
+  roi: `**Расчёт ROI influence-кампании:**\n\n**Формула:** ROI = (Доход − Затраты) / Затраты × 100%\n\n**Пример:**\n- Бюджет на инфлюенсера: 50 000 ₽\n- Продажи по промокоду: 120 000 ₽\n- ROI = (120 000 − 50 000) / 50 000 × 100 = **140%**\n\n**Что включать в затраты:** гонорар, производство, налоги, время менеджера.\n\n**Инструменты атрибуции:** UTM-метки, уникальные промокоды, пиксели.`,
+  бриф: `**Структура брифа для инфлюенсера:**\n\n1. **О бренде** — ценности, tone of voice, позиционирование\n2. **Продукт** — что продвигаем, ключевые преимущества, УТП\n3. **Цель кампании** — охват / продажи / awareness\n4. **Целевая аудитория** — кто должен увидеть контент\n5. **Формат** — Reels, Stories, пост, YouTube-интеграция\n6. **Ключевые сообщения** — что обязательно сказать\n7. **Запреты** — что нельзя упоминать\n8. **Дедлайны** — черновик, согласование, публикация\n9. **Отчётность** — какие метрики предоставить\n\nГотовый бриф снижает число правок и защищает обе стороны.`,
+  cpm: `**CPM (Cost Per Mille)** — стоимость 1000 показов.\n\n**Формула:** CPM = Бюджет / Показы × 1000\n\n**Пример:** 30 000 ₽ бюджет, 500 000 показов → CPM = **60 ₽**\n\n**Средние CPM в России (2024):**\n- Instagram Stories: 80–200 ₽\n- Instagram Reels: 150–400 ₽\n- YouTube интеграция: 300–800 ₽\n- Telegram: 200–600 ₽\n\nСравнивай CPM между инфлюенсерами — это объективный способ оценить эффективность.`,
+  reach: `**Reach vs Impressions — в чём разница:**\n\n**Reach (Охват)** — количество *уникальных* пользователей, увидевших контент.\n\n**Impressions (Показы)** — *общее* количество показов, включая повторные просмотры одним пользователем.\n\n**Пример:** пост увидели 10 000 человек, каждый в среднем 2 раза\n- Reach = 10 000\n- Impressions = 20 000\n\n**Для Influence-маркетинга важнее Reach** — он показывает реальный охват уникальной аудитории.`,
+  ошибки: `**Топ ошибок Junior специалистов в Influence-маркетинге:**\n\n1. **Оценка только по количеству подписчиков** — важнее ER и качество аудитории\n2. **Нет чёткого брифа** — инфлюенсер снимает «как понял»\n3. **Забывают про UTM-метки** — невозможно отследить результат\n4. **Один большой блогер вместо нескольких малых** — риск выше, ROI ниже\n5. **Не проверяют аудиторию на накрутку** — используй HypeAuditor или аналоги\n6. **Нет постаналитики** — без разбора кампании невозможно расти\n7. **Игнорируют Stories в пользу постов** — Stories дают выше конверсию`,
+  платформы: `**Лучшие платформы для работы с инфлюенсерами (2024):**\n\n**Поиск и аналитика:**\n- HypeAuditor — проверка аудитории, ER, накруток\n- GetBlogger — биржа инфлюенсеров, Россия\n- Epicstars — широкая база, автоматизация\n\n**Управление кампаниями:**\n- Storyclash — аналитика Stories\n- Influencer.io — международные кампании\n\n**Каналы (по эффективности в RU):**\n- Telegram — высокая конверсия, доверие\n- Instagram Reels — широкий охват\n- YouTube — долгосрочный контент\n- VK Клипы — рост аудитории\n\nДля старта рекомендую GetBlogger + HypeAuditor.`,
+  default: `Хороший вопрос! Это важная тема в Influence-маркетинге.\n\n**Ключевые принципы:**\n- Influence-маркетинг строится на доверии между инфлюенсером и аудиторией\n- Правильный выбор типа инфлюенсера важнее размера бюджета\n- Метрики (ER, CPM, ROI) — основа для принятия решений\n- Постаналитика каждой кампании — залог роста\n\nПодробнее по этой теме — в уроках курса EL · Influence Academy. Хочешь разобрать какой-то конкретный аспект?`
+};
+
+function getReply(text) {
+  const t = text.toLowerCase();
+  if (t.includes('er') || t.includes('engagement')) return STUBS.er;
+  if (t.includes('nano') || t.includes('micro') || t.includes('отличи') || t.includes('отличи')) return STUBS.nano;
+  if (t.includes('roi') || t.includes('окупа') || t.includes('рассчита')) return STUBS.roi;
+  if (t.includes('бриф') || t.includes('brief')) return STUBS.бриф;
+  if (t.includes('cpm') || t.includes('стоимость') && t.includes('показ')) return STUBS.cpm;
+  if (t.includes('reach') || t.includes('impression') || t.includes('охват')) return STUBS.reach;
+  if (t.includes('ошибк') || t.includes('junior')) return STUBS.ошибки;
+  if (t.includes('платформ') || t.includes('сервис') || t.includes('инструмент')) return STUBS.платформы;
+  return STUBS.default;
+}
+
+// ════════════════════════════════════════════════════════
+// ПОДКЛЮЧЕНИЕ API — раскомментируй когда будешь готов:
+//
+// const API_KEY = 'sk-ant-...'; // ← вставь сюда свой ключ
+//
+// async function callAI(messages) {
+//   const res = await fetch('https://api.anthropic.com/v1/messages', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': API_KEY,
+//       'anthropic-version': '2023-06-01',
+//       'anthropic-dangerous-direct-browser-access': 'true'
+//     },
+//     body: JSON.stringify({
+//       model: 'claude-sonnet-4-20250514',
+//       max_tokens: 1024,
+//       system: `Ты AI ассистент EL · Influence Academy. Эксперт по Influence маркетингу.
+//                Помогай сотрудникам учиться. Говори по-русски, чётко и структурированно.`,
+//       messages
+//     })
+//   });
+//   const data = await res.json();
+//   if (!res.ok) throw new Error(data.error?.message);
+//   return data.content[0].text;
+// }
+// ════════════════════════════════════════════════════════
+
+// ДЕМО: симуляция ответа
+async function callAI(messages) {
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 700));
+  return getReply(messages[messages.length - 1].content);
+}
+
+// ─── STATE ───────────────────────────────────────────────
+let history = [];
+let loading = false;
+
+function resize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function onKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function now() { return new Date().toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }); }
+
+function hideWelcome() { const w = document.getElementById('wlc'); if (w) w.remove(); }
+
+function addMsg(role, text) {
+  hideWelcome();
+  const c = document.getElementById('msgs');
+  const isU = role === 'user';
+  const d = document.createElement('div');
+  d.className = `msg${isU ? ' user' : ''}`;
+  d.innerHTML = `
+    <div class="m-av ${isU ? 'av-user' : 'av-ai'}">${isU ? 'Вы' : '🤖'}</div>
+    <div class="m-bbl">
+      <div class="bbl ${isU ? 'bbl-user' : 'bbl-ai'}">${fmt(text)}</div>
+      <div class="m-time">${now()}</div>
+    </div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+function fmt(t) {
+  return t
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.*?)`/g, '<code style="background:rgba(255,255,255,0.08);padding:1px 5px;border-radius:4px;font-size:12px;font-family:monospace">$1</code>')
+    .replace(/^- (.*$)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .split('\n\n').map(p => p.startsWith('<') ? p : `<p>${p}</p>`).join('');
+}
+
+function showTyping() {
+  hideWelcome();
+  const c = document.getElementById('msgs');
+  const d = document.createElement('div');
+  d.className = 'msg'; d.id = 'typ';
+  d.innerHTML = `<div class="m-av av-ai">🤖</div><div class="m-bbl"><div class="bbl bbl-ai"><div class="typing"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+
+function rmTyping() { const t = document.getElementById('typ'); if (t) t.remove(); }
+
+async function sendMsg() {
+  const inp = document.getElementById('inp');
+  const text = inp.value.trim();
+  if (!text || loading) return;
+  inp.value = ''; inp.style.height = 'auto';
+  loading = true;
+  document.getElementById('sendBtn').disabled = true;
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  showTyping();
+  try {
+    const reply = await callAI(history);
+    history.push({ role: 'assistant', content: reply });
+    rmTyping();
+    addMsg('assistant', reply);
+  } catch (e) {
+    rmTyping();
+    addMsg('assistant', `Ошибка: ${e.message}`);
+  }
+  if (history.length > 20) history = history.slice(-20);
+  loading = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function ask(q) { document.getElementById('inp').value = q; sendMsg(); }
+
+function newChat() {
+  history = [];
+  document.getElementById('msgs').innerHTML = `<div class="welcome" id="wlc">
+    <div class="wl-icon">🤖</div>
+    <h2>AI Ассистент EL · Influence Academy</h2>
+    <p>Помогу разобраться в любой теме курса, объясню метрики, разберу кейсы.</p>
+    <div class="chips">
+      <span class="chip" onclick="ask('Объясни что такое ER простыми словами')">Что такое ER?</span>
+      <span class="chip" onclick="ask('Чем отличается nano от micro инфлюенсера?')">Nano vs Micro</span>
+      <span class="chip" onclick="ask('Как считать ROI кампании?')">ROI</span>
+      <span class="chip" onclick="ask('Как написать бриф?')">Бриф</span>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>

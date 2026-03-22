@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Мой прогресс — EL · Influence Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #E8530A; --gold: #D4A843; --green: #4ade80; --purple: #a78bfa;
+      --bg: #0D0D1A; --surface: #16162A; --surface2: #1E1E35;
+      --border: rgba(255,255,255,0.07); --text: #F0EDE8; --muted: rgba(240,237,232,0.5);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fillBar { from{width:0} to{width:var(--target-width)} }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 0.5px solid var(--border); background: rgba(13,13,26,0.95); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; display: flex; align-items: center; gap: 7px; text-decoration: none; color: var(--text); }
+    .logo-dot { width: 7px; height: 7px; background: #E8530A; border-radius: 50%; animation: pulse 2s infinite; }
+    .nav-links { display: flex; gap: 8px; }
+    .nav-link { color: var(--muted); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 8px; transition: all 0.2s; }
+    .nav-link:hover { color: var(--text); background: var(--surface); }
+    .nav-link.active { color: var(--text); background: var(--surface); }
+
+    .page { max-width: 1060px; margin: 0 auto; padding: 40px 32px 80px; }
+
+    /* HERO CARD */
+    .profile-hero { background: var(--surface); border: 0.5px solid var(--border); border-radius: 20px; padding: 32px; margin-bottom: 24px; display: flex; align-items: center; gap: 28px; flex-wrap: wrap; animation: fadeUp 0.5s ease; }
+    .profile-avatar { width: 72px; height: 72px; background: linear-gradient(135deg, rgba(232,83,10,0.3), rgba(212,168,67,0.2)); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-family: 'Syne', sans-serif; font-weight: 800; flex-shrink: 0; border: 1.5px solid rgba(232,83,10,0.25); }
+    .profile-info h2 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .profile-info p { font-size: 13px; color: var(--muted); font-weight: 300; }
+    .grade-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(74,222,128,0.1); border: 0.5px solid rgba(74,222,128,0.2); border-radius: 100px; padding: 4px 12px; font-size: 12px; color: var(--green); font-weight: 500; margin-top: 8px; }
+    .grade-pip { width: 5px; height: 5px; background: var(--green); border-radius: 50%; }
+    .profile-stats { display: flex; gap: 24px; margin-left: auto; flex-wrap: wrap; }
+    .ps-item { text-align: center; }
+    .ps-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; }
+    .ps-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ps-green { color: var(--green); }
+    .ps-gold { color: var(--gold); }
+    .ps-accent { color: var(--accent); }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+
+    /* CARDS */
+    .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 16px; padding: 24px; }
+    .card-label { font-size: 10px; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; font-weight: 500; margin-bottom: 16px; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.3px; }
+
+    /* GRADE PROGRESS */
+    .grade-row { margin-bottom: 20px; }
+    .grade-row:last-child { margin-bottom: 0; }
+    .gr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .gr-left { display: flex; align-items: center; gap: 10px; }
+    .gr-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .grd-junior { background: var(--green); }
+    .grd-middle { background: var(--gold); }
+    .grd-senior { background: var(--accent); }
+    .gr-name { font-size: 14px; font-weight: 500; }
+    .gr-status { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+    .grs-active { background: rgba(74,222,128,0.1); color: var(--green); }
+    .grs-locked { background: rgba(255,255,255,0.05); color: var(--muted); }
+    .gr-pct { font-size: 13px; color: var(--muted); }
+    .gr-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+    .gr-fill { height: 100%; border-radius: 3px; animation: fillBar 1s ease forwards; }
+    .gf-junior { --target-width: 35%; background: var(--green); }
+    .gf-middle { --target-width: 0%; background: var(--gold); }
+    .gf-senior { --target-width: 0%; background: var(--accent); }
+    .gr-lessons { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    /* ACTIVITY */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item { display: flex; align-items: center; gap: 12px; }
+    .act-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .ai-lesson { background: rgba(74,222,128,0.1); }
+    .ai-test { background: rgba(212,168,67,0.1); }
+    .ai-chat { background: rgba(232,83,10,0.1); }
+    .act-info { flex: 1; min-width: 0; }
+    .act-title { font-size: 13px; font-weight: 500; }
+    .act-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .act-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+    /* ACHIEVEMENTS */
+    .ach-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; }
+    .ach-item { text-align: center; }
+    .ach-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin: 0 auto 6px; }
+    .ach-unlocked { border: 1.5px solid rgba(255,255,255,0.12); background: var(--surface2); }
+    .ach-locked { border: 1.5px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); opacity: 0.4; filter: grayscale(1); }
+    .ach-name { font-size: 10px; color: var(--muted); line-height: 1.3; }
+
+    /* TEST RESULTS */
+    .test-result-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+    .test-result-row:last-child { border-bottom: none; }
+    .tr-left { display: flex; align-items: center; gap: 10px; }
+    .tr-score { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .trs-pass { background: rgba(74,222,128,0.1); color: var(--green); }
+    .trs-fail { background: rgba(248,113,113,0.1); color: #f87171; }
+    .tr-name { font-size: 13px; font-weight: 500; }
+    .tr-date { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .tr-badge { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+    .trb-pass { background: rgba(74,222,128,0.1); color: var(--green); }
+    .trb-fail { background: rgba(248,113,113,0.08); color: #f87171; }
+
+    /* NEXT STEPS */
+    .next-steps { display: flex; flex-direction: column; gap: 10px; }
+    .ns-item { display: flex; align-items: center; gap: 14px; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; text-decoration: none; color: inherit; transition: all 0.2s; }
+    .ns-item:hover { border-color: rgba(255,255,255,0.15); transform: translateX(3px); }
+    .ns-num { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .ns-info { flex: 1; }
+    .ns-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .ns-sub { font-size: 12px; color: var(--muted); }
+    .ns-arrow { color: var(--muted); font-size: 16px; transition: transform 0.2s; }
+    .ns-item:hover .ns-arrow { transform: translateX(4px); }
+
+    /* STREAK */
+    .streak-days { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+    .streak-day { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 500; color: var(--muted); border: 0.5px solid var(--border); }
+    .sd-done { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.2); color: var(--green); }
+    .sd-today { background: rgba(232,83,10,0.15); border-color: rgba(232,83,10,0.3); color: var(--accent); }
+    .streak-stat { display: flex; align-items: baseline; gap: 6px; margin-top: 12px; }
+    .streak-num { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); }
+    .streak-label { font-size: 13px; color: var(--muted); }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .page { padding: 24px 16px 60px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .profile-stats { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo"><span class="logo-dot"></span> EL · Influence Academy</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Главная</a>
+    <a href="lessons.html" class="nav-link">Уроки</a>
+    <a href="test.html" class="nav-link">Тест</a>
+    <a href="ai-assistant.html" class="nav-link">AI</a>
+    <a href="profile.html" class="nav-link active">Прогресс</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="profile-avatar" id="avatarEl">АС</div>
+    <div class="profile-info">
+      <h2 id="nameEl">Алексей Смирнов</h2>
+      <p>Менеджер по маркетингу · Начало обучения: сегодня</p>
+      <div class="grade-pill"><span class="grade-pip"></span> Junior · В процессе обучения</div>
+    </div>
+    <div class="profile-stats">
+      <div class="ps-item"><div class="ps-num ps-green">2</div><div class="ps-label">Уроков пройдено</div></div>
+      <div class="ps-item"><div class="ps-num ps-gold">86%</div><div class="ps-label">Средний балл</div></div>
+      <div class="ps-item"><div class="ps-num ps-accent">3</div><div class="ps-label">Дней в сервисе</div></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- GRADE PROGRESS -->
+    <div class="card">
+      <div class="card-label">Прогресс по грейдам</div>
+      <div class="grade-row">
+        <div class="gr-top">
+          <div class="gr-left"><div class="gr-dot grd-junior"></div><div class="gr-name">Junior</div><span class="gr-status grs-active">В процессе</span></div>
+          <div class="gr-pct">35%</div>
+        </div>
+        <div class="gr-bar"><div class="gr-fill gf-junior"></div></div>
+        <div class="gr-lessons">2 из 9 уроков завершено</div>
+      </div>
+      <div class="grade-row">
+        <div class="gr-top">
+          <div class="gr-left"><div class="gr-dot grd-middle"></div><div class="gr-name">Middle</div><span class="gr-status grs-locked">Заблокировано</span></div>
+          <div class="gr-pct">0%</div>
+        </div>
+        <div class="gr-bar"><div class="gr-fill gf-middle"></div></div>
+        <div class="gr-lessons">Откроется после завершения Junior</div>
+      </div>
+      <div class="grade-row">
+        <div class="gr-top">
+          <div class="gr-left"><div class="gr-dot grd-senior"></div><div class="gr-name">Senior</div><span class="gr-status grs-locked">Заблокировано</span></div>
+          <div class="gr-pct">0%</div>
+        </div>
+        <div class="gr-bar"><div class="gr-fill gf-senior"></div></div>
+        <div class="gr-lessons">Откроется после завершения Middle</div>
+      </div>
+    </div>
+
+    <!-- STREAK -->
+    <div class="card">
+      <div class="card-label">Серия обучения</div>
+      <div class="streak-stat">
+        <div class="streak-num">3</div>
+        <div class="streak-label">дня подряд 🔥</div>
+      </div>
+      <div class="streak-days">
+        <div class="streak-day sd-done">Пн</div>
+        <div class="streak-day sd-done">Вт</div>
+        <div class="streak-day sd-today">Ср</div>
+        <div class="streak-day">Чт</div>
+        <div class="streak-day">Пт</div>
+        <div class="streak-day">Сб</div>
+        <div class="streak-day">Вс</div>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.5">Учись каждый день, чтобы не потерять серию. Регулярность — ключ к результату.</p>
+    </div>
+
+  </div>
+
+  <div class="grid-2">
+
+    <!-- TEST RESULTS -->
+    <div class="card">
+      <div class="card-label">История тестов</div>
+      <div class="test-result-row">
+        <div class="tr-left">
+          <div class="tr-score trs-pass">86%</div>
+          <div><div class="tr-name">Основы Influence маркетинга</div><div class="tr-date">Сегодня · Junior Модуль 1</div></div>
+        </div>
+        <span class="tr-badge trb-pass">Пройден</span>
+      </div>
+      <div class="test-result-row">
+        <div class="tr-left">
+          <div class="tr-score trs-pass">100%</div>
+          <div><div class="tr-name">Типы инфлюенсеров</div><div class="tr-date">Вчера · Junior Урок 2</div></div>
+        </div>
+        <span class="tr-badge trb-pass">Пройден</span>
+      </div>
+      <div class="test-result-row">
+        <div class="tr-left">
+          <div class="tr-score trs-fail">57%</div>
+          <div><div class="tr-name">Основы Influence маркетинга</div><div class="tr-date">3 дня назад · Первая попытка</div></div>
+        </div>
+        <span class="tr-badge trb-fail">Не пройден</span>
+      </div>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="card">
+      <div class="card-label">Следующие шаги</div>
+      <div class="next-steps">
+        <a href="lessons.html" class="ns-item">
+          <div class="ns-num" style="background:rgba(74,222,128,0.1);color:var(--green)">3</div>
+          <div class="ns-info">
+            <div class="ns-title">Урок: Анализ аудитории</div>
+            <div class="ns-sub">Junior · Модуль 1 · 12 минут</div>
+          </div>
+          <div class="ns-arrow">→</div>
+        </a>
+        <a href="test.html" class="ns-item">
+          <div class="ns-num" style="background:rgba(212,168,67,0.1);color:var(--gold)">📝</div>
+          <div class="ns-info">
+            <div class="ns-title">Тест: Основные метрики</div>
+            <div class="ns-sub">Junior · Модуль 1 · 7 вопросов</div>
+          </div>
+          <div class="ns-arrow">→</div>
+        </a>
+        <a href="ai-assistant.html" class="ns-item">
+          <div class="ns-num" style="background:rgba(232,83,10,0.1);color:var(--accent)">🤖</div>
+          <div class="ns-info">
+            <div class="ns-title">Спроси AI о пройденном материале</div>
+            <div class="ns-sub">Закрепи знания через диалог</div>
+          </div>
+          <div class="ns-arrow">→</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="card">
+    <div class="card-label">Достижения</div>
+    <div class="ach-grid">
+      <div class="ach-item"><div class="ach-icon ach-unlocked">🚀</div><div class="ach-name">Первый урок</div></div>
+      <div class="ach-item"><div class="ach-icon ach-unlocked">✅</div><div class="ach-name">Первый тест</div></div>
+      <div class="ach-item"><div class="ach-icon ach-unlocked">🤖</div><div class="ach-name">AI диалог</div></div>
+      <div class="ach-item"><div class="ach-icon ach-unlocked">🔥</div><div class="ach-name">3 дня подряд</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">⭐</div><div class="ach-name">100% за тест</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">📚</div><div class="ach-name">Модуль 1</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">🏅</div><div class="ach-name">Junior готов</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">⚡</div><div class="ach-name">7 дней подряд</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">🎯</div><div class="ach-name">Middle готов</div></div>
+      <div class="ach-item"><div class="ach-icon ach-locked">👑</div><div class="ach-name">Senior эксперт</div></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-label">Последняя активность</div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="act-icon ai-test">📝</div>
+        <div class="act-info"><div class="act-title">Тест «Основы» — 86%</div><div class="act-sub">Junior · Модуль 1</div></div>
+        <div class="act-time">Сегодня</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon ai-chat">🤖</div>
+        <div class="act-info"><div class="act-title">Диалог с AI: «Что такое ER?»</div><div class="act-sub">AI Ассистент · 5 сообщений</div></div>
+        <div class="act-time">Сегодня</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon ai-lesson">📖</div>
+        <div class="act-info"><div class="act-title">Урок 2: Типы инфлюенсеров</div><div class="act-sub">Junior · Модуль 1 · 8 мин</div></div>
+        <div class="act-time">Вчера</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon ai-lesson">📖</div>
+        <div class="act-info"><div class="act-title">Урок 1: Рынок инфлюенсеров</div><div class="act-sub">Junior · Модуль 1 · 10 мин</div></div>
+        <div class="act-time">3 дня назад</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Персонализация имени и инициалов
+const saved = localStorage.getItem('ia_user_name');
+if (saved) {
+  document.getElementById('nameEl').textContent = saved;
+  const parts = saved.split(' ');
+  const initials = parts.map(p => p[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('avatarEl').textContent = initials;
+}
+
+// Имя можно поменять двойным кликом
+document.getElementById('nameEl').addEventListener('dblclick', function() {
+  const name = prompt('Введи своё имя:', this.textContent);
+  if (name && name.trim()) {
+    this.textContent = name.trim();
+    localStorage.setItem('ia_user_name', name.trim());
+    const parts = name.trim().split(' ');
+    const initials = parts.map(p => p[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('avatarEl').textContent = initials;
+  }
+});
+</script>
+
+</body>
+</html>
